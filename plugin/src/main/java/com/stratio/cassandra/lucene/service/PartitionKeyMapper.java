@@ -23,15 +23,20 @@ import org.apache.cassandra.config.ColumnDefinition;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.DecoratedKey;
 import org.apache.cassandra.db.Row;
+import org.apache.cassandra.db.RowPosition;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.dht.IPartitioner;
+import org.apache.cassandra.dht.Token;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TermRangeQuery;
+import org.apache.lucene.util.BytesRef;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -159,6 +164,26 @@ public class PartitionKeyMapper {
 
     public String toString(DecoratedKey decoratedKey) {
         return decoratedKey.getToken() + " - " + ByteBufferUtils.toString(decoratedKey.getKey(), type);
+    }
+
+    public BytesRef bytesRef(DecoratedKey partitionKey) {
+        String serializedKey = ByteBufferUtils.toString(partitionKey.getKey());
+        return new BytesRef(serializedKey);
+    }
+
+    public Query query(DecoratedKey lower, DecoratedKey upper, boolean includeLower, boolean includeUpper) {
+        BytesRef start = lower == null ? null : bytesRef(lower);
+        BytesRef stop = upper == null ? null : bytesRef(upper);
+        if (lower != null && lower.isMinimum()) {
+            start = null;
+        }
+        if (upper != null && upper.isMinimum()) {
+            stop = null;
+        }
+        if (start == null && stop == null) {
+            return null;
+        }
+        return new TermRangeQuery(FIELD_NAME, start, stop, includeLower, includeUpper);
     }
 
 }

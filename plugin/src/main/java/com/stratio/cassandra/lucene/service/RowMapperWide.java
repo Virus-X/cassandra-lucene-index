@@ -17,6 +17,7 @@ package com.stratio.cassandra.lucene.service;
 
 import com.stratio.cassandra.lucene.schema.Schema;
 import com.stratio.cassandra.lucene.schema.column.Columns;
+import com.stratio.cassandra.lucene.util.ByteBufferUtils;
 import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.ColumnDefinition;
 import org.apache.cassandra.db.ColumnFamily;
@@ -40,10 +41,12 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TermQuery;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.lucene.search.BooleanClause.Occur.FILTER;
 import static org.apache.lucene.search.BooleanClause.Occur.MUST;
 import static org.apache.lucene.search.BooleanClause.Occur.SHOULD;
 
@@ -174,8 +177,8 @@ public class RowMapperWide extends RowMapper {
         RowPosition stopPosition = dataRange.stopKey();
         Token startToken = startPosition.getToken();
         Token stopToken = stopPosition.getToken();
-        boolean isSameToken = startToken.compareTo(stopToken) == 0 && !tokenMapper.isMinimum(startToken);
-        BooleanClause.Occur occur = isSameToken ? MUST : SHOULD;
+        boolean isSingleRowRange = startPosition.compareTo(stopPosition) == 0 && !tokenMapper.isMinimum(startToken);
+        BooleanClause.Occur occur = isSingleRowRange ? FILTER : SHOULD;
         boolean includeStart = tokenMapper.includeStart(startPosition);
         boolean includeStop = tokenMapper.includeStop(stopPosition);
 
@@ -192,25 +195,25 @@ public class RowMapperWide extends RowMapper {
 
         if (!startName.isEmpty()) {
             BooleanQuery q = new BooleanQuery();
-            q.add(tokenMapper.query(startToken), MUST);
-            q.add(clusteringKeyMapper.query(startName, null), MUST);
+            q.add(query(startPosition), FILTER);
+            q.add(clusteringKeyMapper.query(startName, null), FILTER);
             query.add(q, occur);
             includeStart = false;
         }
 
         if (!stopName.isEmpty()) {
             BooleanQuery q = new BooleanQuery();
-            q.add(tokenMapper.query(stopToken), MUST);
-            q.add(clusteringKeyMapper.query(null, stopName), MUST);
+            q.add(query(stopPosition), FILTER);
+            q.add(clusteringKeyMapper.query(null, stopName), FILTER);
             query.add(q, occur);
             includeStop = false;
         }
 
-        if (!isSameToken) {
-            Query rangeQuery = tokenMapper.query(startToken, stopToken, includeStart, includeStop);
+        if (!isSingleRowRange) {
+            Query rangeQuery = query(startPosition, stopPosition, includeStart, includeStop);
             if (rangeQuery != null) query.add(rangeQuery, SHOULD);
         } else if (query.getClauses().length == 0) {
-            return tokenMapper.query(startToken);
+            return query(startPosition);
         }
 
         return query.getClauses().length == 0 ? null : query;

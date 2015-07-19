@@ -92,8 +92,6 @@ public class RowMapperSkinny extends RowMapper {
     public final Query query(DataRange dataRange) {
         RowPosition startPosition = dataRange.startKey();
         RowPosition stopPosition = dataRange.stopKey();
-        Token startToken = startPosition.getToken();
-        Token stopToken = stopPosition.getToken();
         boolean includeStart = tokenMapper.includeStart(startPosition);
         boolean includeStop = tokenMapper.includeStop(stopPosition);
         if (startPosition instanceof DecoratedKey) {
@@ -107,7 +105,7 @@ public class RowMapperSkinny extends RowMapper {
                 }
             }
         }
-        return tokenMapper.query(startToken, stopToken, includeStart, includeStop);
+        return query(startPosition, stopPosition, includeStart, includeStop);
     }
 
     /**

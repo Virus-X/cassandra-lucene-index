@@ -23,14 +23,18 @@ import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.DataRange;
 import org.apache.cassandra.db.DecoratedKey;
 import org.apache.cassandra.db.Row;
+import org.apache.cassandra.db.RowPosition;
 import org.apache.cassandra.db.composites.CellName;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 
 import java.nio.ByteBuffer;
+
+import static org.apache.lucene.search.BooleanClause.Occur.FILTER;
 
 /**
  * Class for several {@link Row} mappings between Cassandra and Lucene.
@@ -166,5 +170,37 @@ public abstract class RowMapper {
      * @return The {@link SearchResult} defined by the specified {@link Document} and {@link ScoreDoc}.
      */
     public abstract SearchResult searchResult(Document document, ScoreDoc scoreDoc);
+
+    /**
+     * Returns the specified row position as a Lucene {@link Query}.
+     *
+     * @param rowPosition The row position to be converted.
+     * @return The specified row position as a Lucene {@link Query}.
+     */
+    public Query query(RowPosition rowPosition) {
+        if (rowPosition instanceof DecoratedKey) {
+            return partitionKeyMapper.query((DecoratedKey) rowPosition);
+        } else {
+            return tokenMapper.query(rowPosition.getToken());
+        }
+    }
+
+    public Query query(RowPosition lower, RowPosition upper, boolean includeLower, boolean includeUpper) {
+        if (lower instanceof DecoratedKey && upper instanceof DecoratedKey) {
+            return partitionKeyMapper.query((DecoratedKey) lower, (DecoratedKey) upper, includeLower, includeUpper);
+        } else if (lower instanceof DecoratedKey) {
+            BooleanQuery query = new BooleanQuery();
+            query.add(partitionKeyMapper.query((DecoratedKey) lower, null, includeLower, includeUpper), FILTER);
+            query.add(tokenMapper.query(null, upper.getToken(), includeLower, includeUpper), FILTER);
+            return query;
+        } else if (upper instanceof DecoratedKey) {
+            BooleanQuery query = new BooleanQuery();
+            query.add(tokenMapper.query(lower.getToken(), null, includeLower, includeUpper), FILTER);
+            query.add(partitionKeyMapper.query(null, (DecoratedKey) upper, includeLower, includeUpper), FILTER);
+            return query;
+        } else {
+            return tokenMapper.query(lower.getToken(), upper.getToken(), includeLower, includeUpper);
+        }
+    }
 
 }
