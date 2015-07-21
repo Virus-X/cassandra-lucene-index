@@ -17,6 +17,7 @@ package com.stratio.cassandra.lucene.search.condition;
 
 import com.google.common.base.Objects;
 import com.stratio.cassandra.lucene.schema.Schema;
+import com.stratio.cassandra.lucene.schema.mapping.SingleColumnMapper;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -44,9 +45,10 @@ public class ContainsCondition extends SingleFieldCondition {
      *               #DEFAULT_BOOST} is used as default.
      * @param field  The name of the field to be matched.
      * @param values The value of the field to be matched.
+     * @param mapper Mapper for dynamic types
      */
-    public ContainsCondition(Float boost, String field, Object... values) {
-        super(boost, field);
+    public ContainsCondition(Float boost, String field, SingleColumnMapper<?> mapper, Object... values) {
+        super(boost, field, mapper);
 
         if (values == null || values.length == 0) {
             throw new IllegalArgumentException("Field values required");
@@ -61,7 +63,7 @@ public class ContainsCondition extends SingleFieldCondition {
     public Query query(Schema schema) {
         BooleanQuery query = new BooleanQuery();
         for (Object value : values) {
-            Condition condition = new MatchCondition(boost, field, value);
+            Condition condition = new MatchCondition(boost, field, value, mapper);
             query.add(condition.query(schema), BooleanClause.Occur.SHOULD);
         }
         query.setBoost(boost);

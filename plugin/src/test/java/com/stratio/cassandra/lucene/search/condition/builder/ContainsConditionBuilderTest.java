@@ -31,7 +31,7 @@ public class ContainsConditionBuilderTest extends AbstractConditionBuilderTest {
     @Test
     public void testBuildDefaults() {
         Object[] values = new Object[]{"a", "b"};
-        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", values);
+        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", null, values);
         ContainsCondition condition = builder.build();
         assertNotNull(condition);
         assertEquals(Condition.DEFAULT_BOOST, condition.boost, 0);
@@ -42,7 +42,7 @@ public class ContainsConditionBuilderTest extends AbstractConditionBuilderTest {
     @Test
     public void testBuildStrings() {
         Object[] values = new Object[]{"a", "b"};
-        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", values).boost(0.7);
+        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", null, values).boost(0.7);
         ContainsCondition condition = builder.build();
         assertNotNull(condition);
         assertEquals(0.7f, condition.boost, 0);
@@ -53,7 +53,7 @@ public class ContainsConditionBuilderTest extends AbstractConditionBuilderTest {
     @Test
     public void testBuildNumbers() {
         Object[] values = new Object[]{1, 2, -3};
-        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", values).boost(0.7);
+        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", null, values).boost(0.7);
         ContainsCondition condition = builder.build();
         assertNotNull(condition);
         assertEquals(0.7f, condition.boost, 0);
@@ -63,13 +63,13 @@ public class ContainsConditionBuilderTest extends AbstractConditionBuilderTest {
 
     @Test
     public void testJsonSerializationStrings() {
-        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", "a", "b").boost(0.7);
+        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", null, "a", "b").boost(0.7);
         testJsonSerialization(builder, "{type:\"contains\",field:\"field\",values:[\"a\",\"b\"],boost:0.7}");
     }
 
     @Test
     public void testJsonSerializationNumbers() {
-        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", 1, 2, -3).boost(0.7);
+        ContainsConditionBuilder builder = new ContainsConditionBuilder("field", null, 1, 2, -3).boost(0.7);
         testJsonSerialization(builder, "{type:\"contains\",field:\"field\",values:[1,2,-3],boost:0.7}");
     }
 }

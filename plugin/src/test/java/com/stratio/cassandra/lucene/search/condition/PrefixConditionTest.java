@@ -36,7 +36,7 @@ public class PrefixConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new StringMapper("name", true, true, null));
 
-        PrefixCondition prefixCondition = new PrefixCondition(0.5f, "name", "tr");
+        PrefixCondition prefixCondition = new PrefixCondition(0.5f, "name", "tr", null);
         Query query = prefixCondition.query(schema);
 
         assertNotNull(query);
@@ -52,7 +52,7 @@ public class PrefixConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new IntegerMapper("name", null, null, 1f));
 
-        PrefixCondition prefixCondition = new PrefixCondition(0.5f, "name", "2*");
+        PrefixCondition prefixCondition = new PrefixCondition(0.5f, "name", "2*", null);
         prefixCondition.query(schema);
     }
 
@@ -61,7 +61,7 @@ public class PrefixConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new InetMapper("name", null, null));
 
-        PrefixCondition wildcardCondition = new PrefixCondition(0.5f, "name", "192.168.");
+        PrefixCondition wildcardCondition = new PrefixCondition(0.5f, "name", "192.168.", null);
         Query query = wildcardCondition.query(schema);
 
         assertNotNull(query);
@@ -77,7 +77,7 @@ public class PrefixConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new InetMapper("name", null, null));
 
-        PrefixCondition wildcardCondition = new PrefixCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e");
+        PrefixCondition wildcardCondition = new PrefixCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e", null);
         Query query = wildcardCondition.query(schema);
 
         assertNotNull(query);
@@ -90,7 +90,7 @@ public class PrefixConditionTest extends AbstractConditionTest {
 
     @Test
     public void testToString() {
-        PrefixCondition condition = new PrefixCondition(0.5f, "name", "tr");
+        PrefixCondition condition = new PrefixCondition(0.5f, "name", "tr", null);
         assertEquals("PrefixCondition{field=name, value=tr}", condition.toString());
     }
 

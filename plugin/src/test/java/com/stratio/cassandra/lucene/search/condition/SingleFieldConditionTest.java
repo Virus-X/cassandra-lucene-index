@@ -34,7 +34,7 @@ public class SingleFieldConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuild() {
-        SingleFieldCondition condition = new SingleFieldCondition(0.5f, "field") {
+        SingleFieldCondition condition = new SingleFieldCondition(0.5f, "field", null) {
             @Override
             public Query query(Schema schema) {
                 return null;
@@ -46,7 +46,7 @@ public class SingleFieldConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuildDefaults() {
-        SingleFieldCondition condition = new SingleFieldCondition(null, "field") {
+        SingleFieldCondition condition = new SingleFieldCondition(null, "field", null) {
             @Override
             public Query query(Schema schema) {
                 return null;
@@ -57,7 +57,7 @@ public class SingleFieldConditionTest extends AbstractConditionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildNullField() {
-        new SingleFieldCondition(null, null) {
+        new SingleFieldCondition(null, null, null) {
             @Override
             public Query query(Schema schema) {
                 return null;
@@ -67,7 +67,7 @@ public class SingleFieldConditionTest extends AbstractConditionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildBlankField() {
-        new SingleFieldCondition(null, " ") {
+        new SingleFieldCondition(null, " ", null) {
             @Override
             public Query query(Schema schema) {
                 return null;
@@ -82,7 +82,7 @@ public class SingleFieldConditionTest extends AbstractConditionTest {
         Schema schema = mock(Schema.class);
         when(schema.getMapper("field")).thenReturn(mapper);
 
-        SingleFieldCondition condition = new SingleFieldCondition(null, "field") {
+        SingleFieldCondition condition = new SingleFieldCondition(null, "field", null) {
             @Override
             public Query query(Schema schema) {
                 return null;
@@ -100,7 +100,7 @@ public class SingleFieldConditionTest extends AbstractConditionTest {
         Schema schema = mock(Schema.class);
         when(schema.getMapper("field")).thenReturn(null);
 
-        SingleFieldCondition condition = new SingleFieldCondition(null, "field") {
+        SingleFieldCondition condition = new SingleFieldCondition(null, "field", null) {
             @Override
             public Query query(Schema schema) {
                 return null;

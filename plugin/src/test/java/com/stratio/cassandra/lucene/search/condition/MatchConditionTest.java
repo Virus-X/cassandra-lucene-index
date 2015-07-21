@@ -48,7 +48,7 @@ public class MatchConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuild() {
-        MatchCondition condition = new MatchCondition(0.5f, "field", "value");
+        MatchCondition condition = new MatchCondition(0.5f, "field", "value", null);
         assertEquals(0.5f, condition.boost, 0);
         assertEquals("field", condition.field);
         assertEquals("value", condition.value);
@@ -56,18 +56,18 @@ public class MatchConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuildDefaults() {
-        MatchCondition condition = new MatchCondition(null, "field", "value");
+        MatchCondition condition = new MatchCondition(null, "field", "value", null);
         assertEquals(Condition.DEFAULT_BOOST, condition.boost, 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildNullValue() {
-        new MatchCondition(null, "field", null);
+        new MatchCondition(null, "field", null, null);
     }
 
     @Test
     public void testBuildBlankValue() {
-        MatchCondition condition = new MatchCondition(0.5f, "field", " ");
+        MatchCondition condition = new MatchCondition(0.5f, "field", " ", null);
         assertEquals(0.5f, condition.boost, 0);
         assertEquals("field", condition.field);
         assertEquals(" ", condition.value);
@@ -80,7 +80,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         when(schema.getMapper("field")).thenReturn(new StringMapper("field", null, null, null));
         when(schema.getAnalyzer()).thenReturn(new KeywordAnalyzer());
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "value");
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "value", null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -94,7 +94,7 @@ public class MatchConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new TextMapper("name", null, null, "english"), "english");
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "name", "the");
+        MatchCondition matchCondition = new MatchCondition(0.5f, "name", "the", null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -108,7 +108,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         Schema schema = mock(Schema.class);
         when(schema.getMapper("field")).thenReturn(new IntegerMapper("field", null, null, null));
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42);
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42, null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -126,7 +126,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         Schema schema = mock(Schema.class);
         when(schema.getMapper("field")).thenReturn(new LongMapper("field", null, null, 1f));
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42L);
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42L, null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -144,7 +144,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         Schema schema = mock(Schema.class);
         when(schema.getMapper("field")).thenReturn(new FloatMapper("field", null, null, 1f));
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42.42F);
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42.42F, null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -162,7 +162,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         Schema schema = mock(Schema.class);
         when(schema.getMapper("field")).thenReturn(new DoubleMapper("field", null, null, 1f));
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42.42D);
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", 42.42D, null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -181,7 +181,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         when(schema.getMapper("field")).thenReturn(new BlobMapper("field", null, null));
         when(schema.getAnalyzer()).thenReturn(new KeywordAnalyzer());
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "0Fa1");
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "0Fa1", null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -197,7 +197,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         when(schema.getMapper("field")).thenReturn(new InetMapper("field", null, null));
         when(schema.getAnalyzer()).thenReturn(new KeywordAnalyzer());
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "192.168.0.01");
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "192.168.0.01", null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -213,7 +213,7 @@ public class MatchConditionTest extends AbstractConditionTest {
         when(schema.getMapper("field")).thenReturn(new InetMapper("field", null, null));
         when(schema.getAnalyzer()).thenReturn(new KeywordAnalyzer());
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "2001:DB8:2de::0e13");
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "2001:DB8:2de::0e13", null);
         Query query = matchCondition.query(schema);
 
         assertNotNull(query);
@@ -256,13 +256,13 @@ public class MatchConditionTest extends AbstractConditionTest {
         when(schema.getMapper("field")).thenReturn(mapper);
         when(schema.getAnalyzer()).thenReturn(new KeywordAnalyzer());
 
-        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "2001:DB8:2de::0e13");
+        MatchCondition matchCondition = new MatchCondition(0.5f, "field", "2001:DB8:2de::0e13", null);
         matchCondition.query(schema);
     }
 
     @Test
     public void testToString() {
-        MatchCondition condition = new MatchCondition(0.5f, "name", "2001:DB8:2de::0e13");
+        MatchCondition condition = new MatchCondition(0.5f, "name", "2001:DB8:2de::0e13", null);
         assertEquals("MatchCondition{boost=0.5, field=name, value=2001:DB8:2de::0e13}", condition.toString());
     }
 

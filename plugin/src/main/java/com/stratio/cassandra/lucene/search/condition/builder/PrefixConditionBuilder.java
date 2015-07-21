@@ -53,6 +53,6 @@ public class PrefixConditionBuilder extends ConditionBuilder<PrefixCondition, Pr
      */
     @Override
     public PrefixCondition build() {
-        return new PrefixCondition(boost, field, value);
+        return new PrefixCondition(boost, field, value, buildMapper(field));
     }
 }

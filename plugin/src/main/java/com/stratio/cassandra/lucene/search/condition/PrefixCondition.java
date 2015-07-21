@@ -43,9 +43,10 @@ public class PrefixCondition extends SingleFieldCondition {
      *              #DEFAULT_BOOST} is used as default.
      * @param field The name of the field to be matched.
      * @param value The field prefix to be matched.
+     * @param mapper Mapper for dynamic types.
      */
-    public PrefixCondition(Float boost, String field, String value) {
-        super(boost, field);
+    public PrefixCondition(Float boost, String field, String value, SingleColumnMapper<?> mapper) {
+        super(boost, field, mapper);
 
         if (value == null) {
             throw new IllegalArgumentException("Field value required");

@@ -15,6 +15,8 @@
  */
 package com.stratio.cassandra.lucene.search.condition.builder;
 
+import com.stratio.cassandra.lucene.schema.mapping.SingleColumnMapper;
+import com.stratio.cassandra.lucene.schema.mapping.builder.MapperBuilder;
 import com.stratio.cassandra.lucene.search.condition.Condition;
 import com.stratio.cassandra.lucene.util.Builder;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -48,6 +50,9 @@ public abstract class ConditionBuilder<T extends Condition, K extends ConditionB
     @JsonProperty("boost")
     Float boost;
 
+    @JsonProperty("mapper")
+    MapperBuilder<?> mapper;
+
     /**
      * Sets the boost for the {@link Condition} to be built. Documents matching this condition will (in addition to the
      * normal weightings) have their score multiplied by {@code boost}. If {@code null}, then {@link
@@ -76,6 +81,11 @@ public abstract class ConditionBuilder<T extends Condition, K extends ConditionB
         return (K) this;
     }
 
+    public K mapper(MapperBuilder<?> mapper){
+        this.mapper = mapper;
+        return (K) this;
+    }
+
     /**
      * Returns the {@link Condition} represented by this builder.
      *
@@ -83,4 +93,12 @@ public abstract class ConditionBuilder<T extends Condition, K extends ConditionB
      */
     @Override
     public abstract T build();
+
+    protected SingleColumnMapper<?> buildMapper(String field){
+        if (mapper != null){
+            return  (SingleColumnMapper<?>)mapper.build(field);
+        }
+
+        return null;
+    }
 }

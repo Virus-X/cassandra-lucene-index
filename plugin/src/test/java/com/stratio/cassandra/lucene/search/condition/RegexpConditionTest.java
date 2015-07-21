@@ -33,7 +33,7 @@ public class RegexpConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuild() {
-        RegexpCondition condition = new RegexpCondition(0.5f, "field", "value");
+        RegexpCondition condition = new RegexpCondition(0.5f, "field", "value", null);
         assertEquals(0.5f, condition.boost, 0);
         assertEquals("field", condition.field);
         assertEquals("value", condition.value);
@@ -41,20 +41,20 @@ public class RegexpConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuildDefaults() {
-        RegexpCondition condition = new RegexpCondition(null, "field", "value");
+        RegexpCondition condition = new RegexpCondition(null, "field", "value", null);
         assertEquals(Condition.DEFAULT_BOOST, condition.boost, 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildNullValue() {
-        new RegexpCondition(null, "field", null);
+        new RegexpCondition(null, "field", null, null);
     }
 
     @Test
     public void testBuildBlankValue() {
         Schema schema = mockSchema("name", new StringMapper("name", true, true, null));
 
-        RegexpCondition condition = new RegexpCondition(0.5f, "name", " ");
+        RegexpCondition condition = new RegexpCondition(0.5f, "name", " ", null);
         Query query = condition.query(schema);
 
         assertNotNull(query);
@@ -69,7 +69,7 @@ public class RegexpConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new StringMapper("name", true, true, null));
 
-        RegexpCondition condition = new RegexpCondition(0.5f, "name", "tr*");
+        RegexpCondition condition = new RegexpCondition(0.5f, "name", "tr*", null);
         Query query = condition.query(schema);
 
         assertNotNull(query);
@@ -84,7 +84,7 @@ public class RegexpConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new IntegerMapper("name", null, null, 1f));
 
-        RegexpCondition condition = new RegexpCondition(0.5f, "name", "22*");
+        RegexpCondition condition = new RegexpCondition(0.5f, "name", "22*", null);
         condition.query(schema);
     }
 
@@ -93,7 +93,7 @@ public class RegexpConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new InetMapper("name", null, null));
 
-        RegexpCondition condition = new RegexpCondition(0.5f, "name", "192.168.*");
+        RegexpCondition condition = new RegexpCondition(0.5f, "name", "192.168.*", null);
         Query query = condition.query(schema);
 
         assertNotNull(query);
@@ -108,7 +108,7 @@ public class RegexpConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new InetMapper("name", null, null));
 
-        RegexpCondition regexpCondition = new RegexpCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e*");
+        RegexpCondition regexpCondition = new RegexpCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e*", null);
         Query query = regexpCondition.query(schema);
 
         assertNotNull(query);
@@ -120,7 +120,7 @@ public class RegexpConditionTest extends AbstractConditionTest {
 
     @Test
     public void testToString() {
-        RegexpCondition condition = new RegexpCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e*");
+        RegexpCondition condition = new RegexpCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e*", null);
         assertEquals("RegexpCondition{boost=0.5, field=name, value=2001:db8:2de:0:0:0:0:e*}", condition.toString());
     }
 

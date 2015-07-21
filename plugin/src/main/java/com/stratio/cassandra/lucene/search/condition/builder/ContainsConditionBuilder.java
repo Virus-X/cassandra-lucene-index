@@ -53,6 +53,6 @@ public class ContainsConditionBuilder extends ConditionBuilder<ContainsCondition
      */
     @Override
     public ContainsCondition build() {
-        return new ContainsCondition(boost, field, values);
+        return new ContainsCondition(boost, field, buildMapper(field), values);
     }
 }

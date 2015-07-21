@@ -65,14 +65,16 @@ public class RangeCondition extends SingleFieldCondition {
      * @param upperValue   The upper accepted value. Maybe {@code null} meaning no upper limit.
      * @param includeLower if {@code true}, the {@code lowerValue} is included in the range.
      * @param includeUpper if {@code true}, the {@code upperValue} is included in the range.
+     * @param mapper       Mapper for dynamic types
      */
     public RangeCondition(Float boost,
                           String field,
                           Object lowerValue,
                           Object upperValue,
                           Boolean includeLower,
-                          Boolean includeUpper) {
-        super(boost, field);
+                          Boolean includeUpper,
+                          SingleColumnMapper<?> mapper) {
+        super(boost, field, mapper);
         this.field = field;
         this.lower = lowerValue;
         this.upper = upperValue;

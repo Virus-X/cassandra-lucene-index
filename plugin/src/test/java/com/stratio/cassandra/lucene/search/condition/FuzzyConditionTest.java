@@ -34,7 +34,7 @@ public class FuzzyConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuilder() {
-        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true);
+        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true, null);
         assertEquals("name", condition.field);
         assertEquals("tr", condition.value);
         assertEquals(1, condition.maxEdits);
@@ -45,7 +45,7 @@ public class FuzzyConditionTest extends AbstractConditionTest {
 
     @Test
     public void testBuilderDefaults() {
-        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", null, null, null, null);
+        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", null, null, null, null, null);
         assertEquals("name", condition.field);
         assertEquals("tr", condition.value);
         assertEquals(FuzzyCondition.DEFAULT_MAX_EDITS, condition.maxEdits);
@@ -56,32 +56,32 @@ public class FuzzyConditionTest extends AbstractConditionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderValueNull() {
-        new FuzzyCondition(0.5f, "name", null, 1, 2, 49, true);
+        new FuzzyCondition(0.5f, "name", null, 1, 2, 49, true, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderValueBlank() {
-        new FuzzyCondition(0.5f, "name", " ", 1, 2, 49, true);
+        new FuzzyCondition(0.5f, "name", " ", 1, 2, 49, true, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderMaxEditsTooSmall() {
-        new FuzzyCondition(0.5f, "name", "tr", 1, -2, 49, true);
+        new FuzzyCondition(0.5f, "name", "tr", 1, -2, 49, true, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderMaxEditsTooLarge() {
-        new FuzzyCondition(0.5f, "name", "tr", 100, 2, 49, true);
+        new FuzzyCondition(0.5f, "name", "tr", 100, 2, 49, true, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderPrefixLengthInvalid() {
-        new FuzzyCondition(0.5f, "name", "tr", -2, 2, 49, true);
+        new FuzzyCondition(0.5f, "name", "tr", -2, 2, 49, true, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuilderMaxExpansionsInvalid() {
-        new FuzzyCondition(0.5f, "name", "tr", 1, 2, -1, true);
+        new FuzzyCondition(0.5f, "name", "tr", 1, 2, -1, true, null);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class FuzzyConditionTest extends AbstractConditionTest {
         when(schema.getAnalyzer()).thenReturn(PreBuiltAnalyzers.STANDARD.get());
         when(schema.getMapper("name")).thenReturn(new StringMapper("name", null, null, null));
 
-        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true);
+        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true, null);
         Query query = condition.query(schema);
 
         assertNotNull(query);
@@ -111,13 +111,13 @@ public class FuzzyConditionTest extends AbstractConditionTest {
         when(schema.getAnalyzer()).thenReturn(PreBuiltAnalyzers.STANDARD.get());
         when(schema.getMapper("name")).thenReturn(new IntegerMapper("name", null, null, null));
 
-        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true);
+        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true, null);
         condition.query(schema);
     }
 
     @Test
     public void testToString() {
-        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true);
+        FuzzyCondition condition = new FuzzyCondition(0.5f, "name", "tr", 1, 2, 49, true, null);
         assertEquals(
                 "FuzzyCondition{boost=0.5, field=name, value=tr, maxEdits=1, prefixLength=2, maxExpansions=49, transpositions=true}",
                 condition.toString());

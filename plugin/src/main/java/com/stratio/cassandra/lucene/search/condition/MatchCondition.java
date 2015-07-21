@@ -45,9 +45,10 @@ public class MatchCondition extends SingleFieldCondition {
      *              #DEFAULT_BOOST} is used as default.
      * @param field The name of the field to be matched.
      * @param value The value of the field to be matched.
+     * @param mapper Mapper for dynamic types
      */
-    public MatchCondition(Float boost, String field, Object value) {
-        super(boost, field);
+    public MatchCondition(Float boost, String field, Object value, SingleColumnMapper<?> mapper) {
+        super(boost, field, mapper);
 
         if (value == null) {
             throw new IllegalArgumentException("Field value required");

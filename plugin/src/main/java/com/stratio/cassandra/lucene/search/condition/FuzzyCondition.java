@@ -78,6 +78,7 @@ public class FuzzyCondition extends SingleFieldCondition {
      *                       the maxClauseCount will be used instead.
      * @param transpositions True if transpositions should be treated as a primitive edit operation. If this is false,
      *                       comparisons will implement the classic Levenshtein algorithm.
+     * @param mapper Mapper for dynamic types
      */
     public FuzzyCondition(Float boost,
                           String field,
@@ -85,8 +86,9 @@ public class FuzzyCondition extends SingleFieldCondition {
                           Integer maxEdits,
                           Integer prefixLength,
                           Integer maxExpansions,
-                          Boolean transpositions) {
-        super(boost, field);
+                          Boolean transpositions,
+                          SingleColumnMapper<?> mapper) {
+        super(boost, field, mapper);
 
         if (StringUtils.isBlank(value)) {
             throw new IllegalArgumentException("Field value required");

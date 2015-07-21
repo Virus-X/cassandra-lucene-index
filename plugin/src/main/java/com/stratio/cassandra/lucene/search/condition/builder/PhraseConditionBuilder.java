@@ -69,6 +69,6 @@ public class PhraseConditionBuilder extends ConditionBuilder<PhraseCondition, Ph
      */
     @Override
     public PhraseCondition build() {
-        return new PhraseCondition(boost, field, value, slop);
+        return new PhraseCondition(boost, field, value, slop, buildMapper(field));
     }
 }

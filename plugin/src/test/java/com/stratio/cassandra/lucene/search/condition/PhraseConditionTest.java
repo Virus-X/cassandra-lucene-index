@@ -32,7 +32,7 @@ public class PhraseConditionTest extends AbstractConditionTest {
     @Test
     public void testBuild() {
         String value = "hello adios";
-        PhraseCondition condition = new PhraseCondition(0.5f, "name", value, 2);
+        PhraseCondition condition = new PhraseCondition(0.5f, "name", value, 2, null);
         assertEquals(0.5f, condition.boost, 0);
         assertEquals("name", condition.field);
         assertEquals(value, condition.value);
@@ -42,7 +42,7 @@ public class PhraseConditionTest extends AbstractConditionTest {
     @Test
     public void testBuildDefaults() {
         String value = "hello adios";
-        PhraseCondition condition = new PhraseCondition(null, "name", value, null);
+        PhraseCondition condition = new PhraseCondition(null, "name", value, null, null);
         assertEquals(PhraseCondition.DEFAULT_BOOST, condition.boost, 0);
         assertEquals("name", condition.field);
         assertEquals(value, condition.value);
@@ -51,13 +51,13 @@ public class PhraseConditionTest extends AbstractConditionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildNullValues() {
-        new PhraseCondition(null, "name", null, null);
+        new PhraseCondition(null, "name", null, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildNegativeSlop() {
         String value = "hello adios";
-        new PhraseCondition(null, "name", value, -1);
+        new PhraseCondition(null, "name", value, -1, null);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class PhraseConditionTest extends AbstractConditionTest {
         Schema schema = mockSchema("name", new TextMapper("name", true, true, "spanish"), "spanish");
 
         String value = "hola adios  the    a";
-        PhraseCondition condition = new PhraseCondition(0.5f, "name", value, 2);
+        PhraseCondition condition = new PhraseCondition(0.5f, "name", value, 2, null);
         Query query = condition.query(schema);
         assertNotNull(query);
         assertEquals(PhraseQuery.class, query.getClass());
@@ -78,7 +78,7 @@ public class PhraseConditionTest extends AbstractConditionTest {
 
     @Test
     public void testToString() {
-        PhraseCondition condition = new PhraseCondition(0.5f, "name", "hola adios", 2);
+        PhraseCondition condition = new PhraseCondition(0.5f, "name", "hola adios", 2, null);
         assertEquals("PhraseCondition{boost=0.5, field=name, value=hola adios, slop=2}", condition.toString());
     }
 

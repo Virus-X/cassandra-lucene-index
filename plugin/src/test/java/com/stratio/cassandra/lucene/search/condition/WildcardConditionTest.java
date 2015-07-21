@@ -34,7 +34,7 @@ public class WildcardConditionTest extends AbstractConditionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBuildNullValue() {
-        new WildcardCondition(0.1f, "field", null);
+        new WildcardCondition(0.1f, "field", null, null);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class WildcardConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new StringMapper("name", true, true, null));
 
-        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", " ");
+        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", " ", null);
         Query query = wildcardCondition.query(schema);
 
         assertNotNull(query);
@@ -58,7 +58,7 @@ public class WildcardConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new StringMapper("name", true, true, null));
 
-        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", "tr*");
+        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", "tr*", null);
         Query query = wildcardCondition.query(schema);
 
         assertNotNull(query);
@@ -74,7 +74,7 @@ public class WildcardConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new IntegerMapper("name", null, null, 1f));
 
-        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", "22*");
+        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", "22*", null);
         wildcardCondition.query(schema);
     }
 
@@ -83,7 +83,7 @@ public class WildcardConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new InetMapper("name", null, null));
 
-        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", "192.168.*");
+        WildcardCondition wildcardCondition = new WildcardCondition(0.5f, "name", "192.168.*", null);
         Query query = wildcardCondition.query(schema);
 
         assertNotNull(query);
@@ -99,7 +99,7 @@ public class WildcardConditionTest extends AbstractConditionTest {
 
         Schema schema = mockSchema("name", new InetMapper("name", null, null));
 
-        WildcardCondition condition = new WildcardCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e*");
+        WildcardCondition condition = new WildcardCondition(0.5f, "name", "2001:db8:2de:0:0:0:0:e*", null);
         Query query = condition.query(schema);
 
         assertNotNull(query);

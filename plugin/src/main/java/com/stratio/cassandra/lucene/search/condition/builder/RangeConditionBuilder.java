@@ -107,6 +107,6 @@ public class RangeConditionBuilder extends ConditionBuilder<RangeCondition, Rang
      */
     @Override
     public RangeCondition build() {
-        return new RangeCondition(boost, field, lower, upper, includeLower, includeUpper);
+        return new RangeCondition(boost, field, lower, upper, includeLower, includeUpper, buildMapper(field));
     }
 }

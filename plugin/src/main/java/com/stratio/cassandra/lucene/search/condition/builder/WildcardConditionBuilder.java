@@ -53,6 +53,6 @@ public class WildcardConditionBuilder extends ConditionBuilder<WildcardCondition
      */
     @Override
     public WildcardCondition build() {
-        return new WildcardCondition(boost, field, value);
+        return new WildcardCondition(boost, field, value, buildMapper(field));
     }
 }

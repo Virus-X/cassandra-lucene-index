@@ -47,9 +47,10 @@ public class RegexpCondition extends SingleFieldCondition {
      *              #DEFAULT_BOOST} is used as default.
      * @param field The name of the field to be matched.
      * @param value The wildcard expression to be matched.
+     * @param mapper Mapper for dynamic types
      */
-    public RegexpCondition(Float boost, String field, String value) {
-        super(boost, field);
+    public RegexpCondition(Float boost, String field, String value, SingleColumnMapper<?> mapper) {
+        super(boost, field, mapper);
 
         if (value == null) {
             throw new IllegalArgumentException("Field value required");

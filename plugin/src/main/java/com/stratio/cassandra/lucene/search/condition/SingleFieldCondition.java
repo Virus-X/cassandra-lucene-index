@@ -34,27 +34,35 @@ public abstract class SingleFieldCondition extends Condition {
     /** The name of the field to be matched. */
     public final String field;
 
+    /** Mapper for dynamic types */
+    public final SingleColumnMapper<?> mapper;
+
     /**
      * Abstract {@link SingleFieldCondition} builder receiving the boost to be used.
      *
      * @param boost The boost for this query clause. Documents matching this clause will (in addition to the normal
      *              weightings) have their score multiplied by {@code boost}.
      * @param field The name of the field to be matched.
+     * @param mapper The mapper for dynamic types
      */
-    public SingleFieldCondition(Float boost, String field) {
+    public SingleFieldCondition(Float boost, String field, SingleColumnMapper<?> mapper) {
         super(boost);
         if (StringUtils.isBlank(field)) {
             throw new IllegalArgumentException("Field name required");
         }
         this.field = field;
+        this.mapper = mapper;
     }
 
     protected SingleColumnMapper<?> getMapper(Schema schema, String field) {
-        Mapper mapper = schema.getMapper(field);
-        if (mapper != null && mapper instanceof SingleColumnMapper<?>) {
-            return (SingleColumnMapper<?>) mapper;
+        if (mapper != null){
+            return mapper;
+        }
+
+        Mapper defaultMapper = schema.getMapper(field);
+        if (defaultMapper != null && defaultMapper instanceof SingleColumnMapper<?>) {
+            return (SingleColumnMapper<?>) defaultMapper;
         }
         throw new IllegalArgumentException("Not found mapper for field " + field);
     }
-
 }

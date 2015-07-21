@@ -51,9 +51,10 @@ public class PhraseCondition extends SingleFieldCondition {
      * @param field The name of the field to be matched.
      * @param value The phrase terms to be matched.
      * @param slop  The number of other words permitted between words in phrase.
+     * @param mapper Mapper for dynamic types
      */
-    public PhraseCondition(Float boost, String field, String value, Integer slop) {
-        super(boost, field);
+    public PhraseCondition(Float boost, String field, String value, Integer slop, SingleColumnMapper<?> mapper) {
+        super(boost, field, mapper);
 
         if (value == null) {
             throw new IllegalArgumentException("Field value required");
