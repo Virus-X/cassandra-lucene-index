@@ -16,6 +16,7 @@
 package com.stratio.cassandra.lucene.schema.mapping;
 
 import com.stratio.cassandra.lucene.schema.analysis.PreBuiltAnalyzers;
+import com.stratio.cassandra.lucene.schema.column.Column;
 import com.stratio.cassandra.lucene.schema.column.Columns;
 import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.ColumnDefinition;
@@ -184,4 +185,19 @@ public abstract class Mapper {
 
     public abstract void validate(CFMetaData metaData);
 
+    public int compare(Column column1, Column column2){
+        if (column1 == null)
+        {
+            return column2 == null ? 0 : -1;
+        }
+        if (column2 == null)
+        {
+            return 1;
+        }
+
+        AbstractType<?> type = column1.getType();
+        ByteBuffer value1 = column1.getDecomposedValue();
+        ByteBuffer value2 = column2.getDecomposedValue();
+        return type.compare(value1, value2);
+    }
 }

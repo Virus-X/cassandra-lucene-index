@@ -97,7 +97,7 @@ public class SortFieldTest {
         when(schema.getMapper("field")).thenReturn(new StringMapper("field", null, null, null));
 
         SortField sortField = new SortField("field", false);
-        Comparator<Columns> comparator = sortField.comparator();
+        Comparator<Columns> comparator = sortField.comparator(schema);
 
         Column<String> lowerColumn = Column.fromComposed("field", "a", UTF8Type.instance, false);
         Column<String> upperColumn = Column.fromComposed("field", "z", UTF8Type.instance, false);
@@ -116,7 +116,7 @@ public class SortFieldTest {
         when(schema.getMapper("field")).thenReturn(new StringMapper("field", null, null, null));
 
         SortField sortField = new SortField("field", true);
-        Comparator<Columns> comparator = sortField.comparator();
+        Comparator<Columns> comparator = sortField.comparator(schema);
 
         Column<String> lowerColumn = Column.fromComposed("field", "a", UTF8Type.instance, false);
         Column<String> upperColumn = Column.fromComposed("field", "z", UTF8Type.instance, false);
@@ -130,8 +130,9 @@ public class SortFieldTest {
     @Test
     public void testComparatorNullColumns() {
 
+        Schema schema = mock(Schema.class);
         SortField sortField = new SortField("field", true);
-        Comparator<Columns> comparator = sortField.comparator();
+        Comparator<Columns> comparator = sortField.comparator(schema);
 
         Column<String> column = Column.fromComposed("field", "a", UTF8Type.instance, false);
         Columns columns = new Columns().add(column);
@@ -144,8 +145,9 @@ public class SortFieldTest {
     @Test
     public void testComparatorNullColumn() {
 
+        Schema schema = mock(Schema.class);
         SortField sortField = new SortField("field", true);
-        Comparator<Columns> comparator = sortField.comparator();
+        Comparator<Columns> comparator = sortField.comparator(schema);
 
         Columns columns1 = new Columns().add(Column.fromComposed("field", "a", UTF8Type.instance, false));
         Columns columns2 = new Columns();

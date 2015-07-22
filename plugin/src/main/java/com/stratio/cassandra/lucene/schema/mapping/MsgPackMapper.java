@@ -49,12 +49,28 @@ public class MsgPackMapper extends Mapper {
     @Override
     public void addFields(Document document, Columns columns) {
         for (Column column : columns.getColumnsByName(name)) {
-            String name = column.getFullName();
-            Log.info("n:" + name);
-            Log.info("column: " + column);
+            if (column.getNameSuffix() != null && !column.getNameSuffix().isEmpty()){
+                // Index key names in maps to be able to check key existence
+                document.add(new StringField(column.getName(), column.getNameSuffix(), Field.Store.NO));
+            }
 
-            for(Field f : extractFields(name, Unpack(column.getComposedValue()), 0)){
+            ImmutableValue value = Unpack(column.getComposedValue());
+            String propertyName = column.getFullName();
+            for(Field f : extractFields(propertyName, value, 0)){
                 document.add(f);
+            }
+
+            if (value.isStringValue()){
+                Log.info("String field: %s [%s]",propertyName, value.asStringValue().asString());
+                document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asStringValue().asString())));
+            }else if (value.isIntegerValue()){
+                Log.info("Int field: " + value.asIntegerValue().toLong());
+                document.add(new NumericDocValuesField(propertyName, value.asIntegerValue().toLong()));
+            }else if (value.isFloatValue()){
+                Log.info("Float field: " + value.asFloatValue().toDouble());
+                document.add(new NumericDocValuesField(propertyName, Double.doubleToLongBits(value.asFloatValue().toDouble())));
+            }else if (value.isBooleanValue()){
+                document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asBooleanValue().getBoolean()? "true": "false")));
             }
         }
     }
@@ -198,23 +214,16 @@ public class MsgPackMapper extends Mapper {
     }
 
     private byte[] asBytes(Object value) {
-        Log.info("Value type: " + value.getClass().getName());
-
         if (value == null) {
-            Log.info("Value null");
             return null;
         }
         else if (value instanceof ByteBuffer) {
-            Log.info("Byte buffer!!");
             ByteBuffer bb = (ByteBuffer) value;
             return ByteBufferUtils.asArray(bb);
         } else if (value instanceof byte[]) {
-            Log.info("Byte array!!");
             return (byte[]) value;
         } else if (value instanceof String) {
             String string = (String) value;
-
-            Log.info("String: " + string);
             string = string.replaceFirst("0x", "");
             return Hex.hexToBytes(string);
         } else {

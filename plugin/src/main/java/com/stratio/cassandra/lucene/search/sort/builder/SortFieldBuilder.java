@@ -15,6 +15,9 @@
  */
 package com.stratio.cassandra.lucene.search.sort.builder;
 
+import com.stratio.cassandra.lucene.schema.mapping.Mapper;
+import com.stratio.cassandra.lucene.schema.mapping.SingleColumnMapper;
+import com.stratio.cassandra.lucene.schema.mapping.builder.MapperBuilder;
 import com.stratio.cassandra.lucene.search.sort.SortField;
 import com.stratio.cassandra.lucene.util.Builder;
 import org.codehaus.jackson.annotate.JsonCreator;
@@ -35,6 +38,9 @@ public class SortFieldBuilder implements Builder<SortField> {
     @JsonProperty("reverse")
     boolean reverse;
 
+    @JsonProperty("mapper")
+    MapperBuilder<?> mapper;
+
     /**
      * Creates a new {@link SortFieldBuilder} for the specified field and reverse option.
      *
@@ -44,6 +50,7 @@ public class SortFieldBuilder implements Builder<SortField> {
     public SortFieldBuilder(@JsonProperty("field") String field) {
         this.field = field;
         this.reverse = SortField.DEFAULT_REVERSE;
+        this.mapper = null;
     }
 
     /**
@@ -60,6 +67,14 @@ public class SortFieldBuilder implements Builder<SortField> {
     /** {@inheritDoc} */
     @Override
     public SortField build() {
-        return new SortField(field, reverse);
+        return new SortField(field, reverse, buildMapper(field));
+    }
+
+    private Mapper buildMapper(String field){
+        if (mapper != null){
+            return  mapper.build(field);
+        }
+
+        return null;
     }
 }

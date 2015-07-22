@@ -21,6 +21,9 @@ import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+
+import java.nio.ByteBuffer;
 
 /**
  * Class for mapping between Cassandra's columns and Lucene documents.
@@ -47,12 +50,17 @@ public abstract class SingleColumnMapper<BASE> extends Mapper {
             Object value = column.getComposedValue();
             boolean isCollection = column.isCollection();
             addFields(document, name, value, isCollection);
+
+            if (column.getNameSuffix() != null && !column.getNameSuffix().isEmpty()){
+                // Index key names in maps to be able to check key existence
+                document.add(new StringField(column.getName(), column.getNameSuffix(), Field.Store.NO));
+            }
         }
     }
 
     public final void addFields(Document document, String name, Object value, boolean isCollection) {
         BASE base = base(name, value);
-        if (indexed) document.add(indexedField(name, base));
+        if (indexed) document.add(indexedField(name,base));
         if (sorted) document.add(sortedField(name, base, isCollection));
     }
 

@@ -76,6 +76,8 @@ public class Column<T> {
         return name;
     }
 
+    public String getNameSuffix() { return nameSufix; }
+
     /**
      * Returns the full name, which is formed by the column name and sufix.
      *
