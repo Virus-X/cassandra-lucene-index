@@ -44,6 +44,9 @@ public class SearchBuilder {
     @JsonProperty("sort")
     SortBuilder sortBuilder;
 
+    @JsonProperty("skip")
+    int skip;
+
     /**
      * Returns this builder with the specified querying condition.
      *
@@ -97,7 +100,7 @@ public class SearchBuilder {
         Condition query = queryBuilder == null ? null : queryBuilder.build();
         Condition filter = filterBuilder == null ? null : filterBuilder.build();
         Sort sort = sortBuilder == null ? null : sortBuilder.build();
-        return new Search(query, filter, sort);
+        return new Search(query, filter, sort, skip);
     }
 
     /**

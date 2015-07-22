@@ -44,6 +44,8 @@ public class Search {
      */
     private final Sort sort;
 
+    private final int skip;
+
     /**
      * Returns a new {@link Search} composed by the specified querying and filtering conditions.
      *
@@ -52,10 +54,11 @@ public class Search {
      * @param sort            The {@link Sort} for the query. Note that is the order in which the data will be read
      *                        before querying, not the order of the results after querying.
      */
-    public Search(Condition queryCondition, Condition filterCondition, Sort sort) {
+    public Search(Condition queryCondition, Condition filterCondition, Sort sort, int skip) {
         this.queryCondition = queryCondition;
         this.filterCondition = filterCondition;
         this.sort = sort;
+        this.skip = skip;
     }
 
     /**
@@ -99,6 +102,8 @@ public class Search {
     public Sort getSort() {
         return this.sort;
     }
+
+    public int getSkip() {return this.skip; }
 
     /**
      * Returns the Lucene {@link org.apache.lucene.search.Sort} represented by this {@link Sort} using the specified

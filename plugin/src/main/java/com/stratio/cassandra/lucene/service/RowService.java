@@ -284,6 +284,7 @@ public abstract class RowService {
         int numDocs = 0;
         int numPages = 0;
         int numRows = 0;
+        int skip = search.getSkip();
         searchTime.start();
 
         List<ScoredRow> scoredRows = new LinkedList<>();
@@ -308,7 +309,7 @@ public abstract class RowService {
             // Setup non-cached search arguments
             Sort sort = search.sort(schema);
             boolean relevance = search.usesRelevance();
-            int page = Math.min(limit, MAX_PAGE_SIZE);
+            int page = Math.min(limit + skip, MAX_PAGE_SIZE);
             boolean maybeMore;
 
             do {
@@ -316,11 +317,20 @@ public abstract class RowService {
                 luceneTime.start();
                 Set<String> fields = fieldsToLoad();
                 Map<Document, ScoreDoc> docs = luceneIndex.search(searcher, query, sort, last, page, fields, relevance);
+
+                maybeMore = docs.size() == page;
+
                 List<SearchResult> searchResults = new ArrayList<>(docs.size());
                 for (Map.Entry<Document, ScoreDoc> entry : docs.entrySet()) {
                     Document document = entry.getKey();
                     ScoreDoc scoreDoc = entry.getValue();
                     last = scoreDoc;
+
+                    if (skip > 0){
+                        skip--;
+                        continue;
+                    }
+
                     searchResults.add(rowMapper.searchResult(document, scoreDoc));
                 }
                 numDocs += searchResults.size();
@@ -337,7 +347,6 @@ public abstract class RowService {
                 collectTime.stop();
 
                 // Setup next iteration
-                maybeMore = searchResults.size() == page;
                 page = Math.min(Math.max(FILTERING_PAGE_SIZE, numRows - limit), MAX_PAGE_SIZE);
                 numPages++;
 

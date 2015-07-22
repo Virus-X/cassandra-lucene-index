@@ -18,7 +18,7 @@ public class SearchTest {
 
     @Test
     public void testBuilderEmpty() {
-        Search search = new Search(null, null, null);
+        Search search = new Search(null, null, null, 0);
         assertNotNull(search);
     }
 
