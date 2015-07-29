@@ -26,12 +26,11 @@ import java.util.Map;
  * Created by vgoncharenko on 20.07.2015.
  */
 public class MsgPackMapper extends Mapper {
-    /** The default limit for depth of message pack fields. */
-    private static final int DEFAULT_DEPTH_LIMIT = 2;
-
     /** The default case sensitive option. */
     public static final boolean DEFAULT_CASE_SENSITIVE = true;
-
+    final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    /** The default limit for depth of message pack fields. */
+    private static final int DEFAULT_DEPTH_LIMIT = 2;
     /** If it must be case sensitive. */
     private final boolean caseSensitive;
 
@@ -46,6 +45,16 @@ public class MsgPackMapper extends Mapper {
         this.caseSensitive = caseSensitive == null ? DEFAULT_CASE_SENSITIVE : caseSensitive;
     }
 
+    private static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
     @Override
     public void addFields(Document document, Columns columns) {
         for (Column column : columns.getColumnsByName(name)) {
@@ -56,21 +65,29 @@ public class MsgPackMapper extends Mapper {
 
             ImmutableValue value = Unpack(column.getComposedValue());
             String propertyName = column.getFullName();
-            for(Field f : extractFields(propertyName, value, 0)){
-                document.add(f);
-            }
+            try
+            {
+                for(Field f : extractFields(propertyName, value, 0)){
+                    document.add(f);
+                }
 
-            if (value.isStringValue()){
-                Log.info("String field: %s [%s]",propertyName, value.asStringValue().asString());
-                document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asStringValue().asString())));
-            }else if (value.isIntegerValue()){
-                Log.info("Int field: " + value.asIntegerValue().toLong());
-                document.add(new NumericDocValuesField(propertyName, value.asIntegerValue().toLong()));
-            }else if (value.isFloatValue()){
-                Log.info("Float field: " + value.asFloatValue().toDouble());
-                document.add(new NumericDocValuesField(propertyName, Double.doubleToLongBits(value.asFloatValue().toDouble())));
-            }else if (value.isBooleanValue()){
-                document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asBooleanValue().getBoolean()? "true": "false")));
+                if (value.isStringValue()){
+                    Log.info("String field: %s [%s]",propertyName, value.asStringValue().asString());
+                    document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asStringValue().asString())));
+                }else if (value.isIntegerValue()){
+                    Log.info("Int field: " + value.asIntegerValue().toLong());
+                    //document.add(new NumericDocValuesField("n_" + propertyName, value.asIntegerValue().toLong()));
+                    document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asIntegerValue().toString())));
+                }else if (value.isFloatValue()){
+                    Log.info("Float field: " + value.asFloatValue().toDouble());
+                    //document.add(new NumericDocValuesField("n_" + propertyName, Double.doubleToLongBits(value.asFloatValue().toDouble())));
+                    document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asFloatValue().toString())));
+                }else if (value.isBooleanValue()){
+                    document.add(new SortedDocValuesField(propertyName, new BytesRef(value.asBooleanValue().getBoolean()? "true": "false")));
+                }
+            }catch (Exception ex){
+                byte [] rawData = asBytes(column.getComposedValue());
+                Log.error("Failed to index field %s of type %s: %s\r\nRaw value: %s", name, value.getValueType().toString(), ex.getMessage(), bytesToHex(rawData));
             }
         }
     }
@@ -102,6 +119,12 @@ public class MsgPackMapper extends Mapper {
 
     private List<Field> extractFields(String name, Value v, int depth){
         ArrayList<Field> fields = new ArrayList<Field>();
+
+        if (v.isNilValue()){
+            Log.info("nil value");
+            return fields;
+        }
+
         switch (v.getValueType()) {
             case NIL:
             case EXTENSION:
@@ -111,8 +134,10 @@ public class MsgPackMapper extends Mapper {
                 fields.add(new StringField(name, v.asBooleanValue().getBoolean() ? "true" : "false", STORE));
                 break;
             case INTEGER:
+                fields.add(new DoubleField(name, v.asIntegerValue().asLong(), STORE));
+                break;
             case FLOAT:
-                fields.add(new DoubleField(name, v.asNumberValue().toDouble(), STORE));
+                fields.add(new DoubleField(name, v.asFloatValue().toDouble(), STORE));
                 break;
             case STRING:
                 String data = caseSensitive
@@ -125,22 +150,22 @@ public class MsgPackMapper extends Mapper {
                 fields.add(new StringField(name, Hex.bytesToHex(v.asBinaryValue().asByteArray()), STORE));
                 break;
             case ARRAY:
-                for (Value val : v.asArrayValue())                {
+                for (Value val : v.asArrayValue()) {
                     fields.addAll(extractFields(name, val, depth));
                 }
                 break;
             case MAP:
-                if (depth >= DEFAULT_DEPTH_LIMIT){
+                if (depth >= DEFAULT_DEPTH_LIMIT) {
                     // Depth limit reached
                     break;
                 }
 
-                for (Map.Entry<Value,Value> kvp : v.asMapValue().entrySet()){
+                for (Map.Entry<Value, Value> kvp : v.asMapValue().entrySet()) {
                     Value key = kvp.getKey();
-                    if (key.isNumberValue() || key.isBooleanValue() || key.isStringValue()){
+                    if (key.isNumberValue() || key.isBooleanValue() || key.isStringValue()) {
                         String keyName = name + "." + key.toString();
                         fields.addAll(extractFields(keyName, kvp.getValue(), depth + 1));
-                    }else{
+                    } else {
                         // Key cannot have type map or array
                         continue;
                     }
@@ -203,7 +228,6 @@ public class MsgPackMapper extends Mapper {
     }
 
     private ImmutableValue Unpack(Object value){
-        Log.info("value: " + value);
         byte [] data = asBytes(value);
         try {
             return org.msgpack.core.MessagePack.newDefaultUnpacker(data).unpackValue();

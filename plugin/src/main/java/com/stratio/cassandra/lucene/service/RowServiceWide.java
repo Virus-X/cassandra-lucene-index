@@ -16,6 +16,7 @@
 package com.stratio.cassandra.lucene.service;
 
 import com.google.common.collect.Lists;
+import com.stratio.cassandra.lucene.util.Log;
 import org.apache.cassandra.config.ColumnDefinition;
 import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.ColumnFamilyStore;
@@ -84,6 +85,7 @@ public class RowServiceWide extends RowService {
         DeletionInfo deletionInfo = columnFamily.deletionInfo();
         DecoratedKey partitionKey = rowMapper.partitionKey(key);
 
+        try{
         if (columnFamily.iterator().hasNext()) {
             List<CellName> clusteringKeys = rowMapper.clusteringKeys(columnFamily);
             Map<CellName, Row> rows = rows(partitionKey, clusteringKeys, timestamp);
@@ -106,6 +108,8 @@ public class RowServiceWide extends RowService {
                 Term term = rowMapper.term(partitionKey);
                 luceneIndex.delete(term);
             }
+        }}catch (Exception ex){
+            Log.error("FAILED TO PERFORM INDEXING: %s consider recreating your index", ex.getMessage());
         }
     }
 

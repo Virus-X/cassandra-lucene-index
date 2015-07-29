@@ -112,8 +112,10 @@ public class Index extends PerRowSecondaryIndex {
 
             Log.info("Initialized index %s", logName);
         } catch (Exception e) {
+            rowService = null;
             Log.error(e, "Error while initializing Lucene index %s", logName);
-            throw new RuntimeException(e);
+            Log.warn("Index %s for %s IS DISABLED!", baseCfs.metadata.ksName, baseCfs.metadata.cfName);
+            //throw new RuntimeException(e);
         }
     }
 
@@ -172,7 +174,8 @@ public class Index extends PerRowSecondaryIndex {
         } catch (Exception e) {
             String message = "Error while validating Lucene index options: " + e.getMessage();
             Log.error(e, message);
-            throw new ConfigurationException(message, e);
+            return;
+            //throw new ConfigurationException(message, e);
         }
     }
 
